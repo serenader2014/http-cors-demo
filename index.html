@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTTP CORS demo</title>
+</head>
+<body>
+  <p>请打开 chrome 的 devtools 观看请求详情</p>
+  <ul>
+  </ul>
+  <script type="text/template" id="tmpl">
+    <h3>{{desc}}</h3>
+    <p>请求地址：<span>{{url}}</span></p>
+    <p>请求方法：<span>{{method}}</span></p>
+    <p>请求额外头：<span>{{headers}}</span></p>
+    <button onclick="{{callback}}()">start</button>
+    <p>结果：<span class="result" style="color:red"></span></p>
+  </script>
+  <script>
+    var tmpl = document.querySelector('#tmpl')
+    var ul = document.querySelector('ul')
+    document.cookie = 'testcookie=somevalue'
+    var apiBase = 'http://localhost:3333'
+    var demosConfig = [
+      {
+        desc: '请求没有配置跨域头的接口：',
+        url: '/no-cors',
+      },
+      {
+        desc: '请求有配 Access-Control-Allow-Origin 响应头的接口，但是其值非 localhost',
+        url: '/api1',
+      },
+      {
+        desc: '请求有配正确的 Access-Control-Allow-Origin 响应头的接口',
+        url: '/api2',
+      },
+      {
+        desc: '请求上一个接口并且带有额外的请求头',
+        url: '/api2',
+        headers: {
+          'X-Custom-Header': 'Hello'
+        }
+      },
+      {
+        desc: '请求有正确配置 Access-Control-Allow-Headers 响应头的接口',
+        url: '/api3',
+        headers: {
+          'X-Custom-Header': 'Hello'
+        }
+      },
+      {
+        desc: '请求上一个接口，但是使用了PUT方法',
+        url: '/api3',
+        method: 'PUT',
+      },
+      {
+        desc: '请求有正确配置 Access-Control-Allow-Methods 响应头的接口',
+        url: '/api4',
+        method: 'PUT'
+      },
+      {
+        desc: '请求带上 cookie ,但是接口没有配置 Access-Control-Allow-Credentials',
+        url: '/api6',
+        withCredentials: true
+      },
+      {
+        desc: '请求配置有 Access-Control-Allow-Credentials 的接口，但是接口 Access-Control-Allow-Origin 为通配符',
+        url: '/api5',
+        withCredentials: true
+      },
+      {
+        desc: '请求有正确配置 Access-Control-Allow-Origin 和 Access-Control-Allow-Credentials 的接口',
+        url: '/api7',
+        withCredentials: true
+      }
+    ]
+
+    demosConfig.forEach(function(demo, index) {
+      var tmplText = tmpl.innerText
+      var callbackName = 'callback' + index
+      window[callbackName] = function() {
+        request(apiBase + demo.url, { 
+          method: demo.method, 
+          headers: demo.headers, 
+          withCredentials: demo.withCredentials
+        }, function(err, data) {
+          if (err) {
+            wrapper.querySelector('.result').innerHTML = '失败了'
+            console.error(err)
+          } else {
+            wrapper.querySelector('.result').innerHTML = '成功了'
+            console.log(data)
+          }
+        })
+
+      }
+      tmplText = tmplText.replace(/{{desc}}/g, demo.desc)
+      tmplText = tmplText.replace(/{{callback}}/g, callbackName)
+      tmplText = tmplText.replace(/{{url}}/g, demo.url)
+      tmplText = tmplText.replace(/{{method}}/g, demo.method || 'GET')
+      tmplText = tmplText.replace(/{{headers}}/g, JSON.stringify(demo.headers || {}))
+      var wrapper = document.createElement('li')
+      wrapper.innerHTML = tmplText
+      ul.appendChild(wrapper)
+    })
+
+    function request(url, options, callback) {
+      options = options || {}
+      options.method = options.method || 'GET'
+      options.headers = options.headers || {}
+      var xhr = new XMLHttpRequest()
+      xhr.open(options.method, url)
+      for (var i in options.headers) {
+        xhr.setRequestHeader(i, options.headers[i])
+      }
+      xhr.onload = function() {
+        callback(null, xhr.responseText)
+      }
+      xhr.onerror = function(e) {
+        callback(e)
+      }
+      if (options.withCredentials) {
+        xhr.withCredentials = true
+      }
+      xhr.send()
+    }
+
+  </script>
+</body>
+</html>
