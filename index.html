@@ -9,10 +9,12 @@
   <ul>
   </ul>
   <script type="text/template" id="tmpl">
-    <h3>{{desc}}</h3>
+    <h3>Demo No.{{index}} - {{desc}}</h3>
     <p>请求地址：<span>{{url}}</span></p>
     <p>请求方法：<span>{{method}}</span></p>
     <p>请求额外头：<span>{{headers}}</span></p>
+    <p>是否上传文件：<span>{{upload}}</span></p>
+    <p>是否监听上传事件：<span>{{listenUpload}}</span></p>
     <button onclick="{{callback}}()">start</button>
     <p>结果：<span class="result" style="color:red"></span></p>
   </script>
@@ -128,11 +130,14 @@
           startRequest()
         }
       }
+      tmplText = tmplText.replace(/{{index}}/g, index)
       tmplText = tmplText.replace(/{{desc}}/g, demo.desc)
       tmplText = tmplText.replace(/{{callback}}/g, callbackName)
       tmplText = tmplText.replace(/{{url}}/g, demo.url)
       tmplText = tmplText.replace(/{{method}}/g, demo.method || 'GET')
       tmplText = tmplText.replace(/{{headers}}/g, JSON.stringify(demo.headers || {}))
+      tmplText = tmplText.replace(/{{upload}}/g, demo.upload || false)
+      tmplText = tmplText.replace(/{{listenUpload}}/g, demo.listenUpload || false)
       var wrapper = document.createElement('li')
       wrapper.innerHTML = tmplText
       ul.appendChild(wrapper)
