@@ -72,17 +72,39 @@
         desc: '请求有正确配置 Access-Control-Allow-Origin 和 Access-Control-Allow-Credentials 的接口',
         url: '/api7',
         withCredentials: true
+      },
+      {
+        desc: '上传文件到没有配置 options 请求的接口',
+        url: '/api2',
+        upload: true,
+        method: 'POST'
+      },
+      {
+        desc: '上传文件到没有配置 options 请求的接口，并且监听上传事件',
+        url: '/api2',
+        method: 'POST',
+        upload: true,
+        listenUpload: true
+      },
+      {
+        desc: '上传文件到有正确配置 options 请求的接口，并且监听上传事件',
+        url: '/api3',
+        method: 'POST',
+        upload: true,
+        listenUpload: true,
       }
     ]
 
     demosConfig.forEach(function(demo, index) {
       var tmplText = tmpl.innerText
       var callbackName = 'callback' + index
-      window[callbackName] = function() {
+      function startRequest() {
         request(apiBase + demo.url, { 
           method: demo.method, 
           headers: demo.headers, 
-          withCredentials: demo.withCredentials
+          withCredentials: demo.withCredentials,
+          files: demo.files,
+          listenUpload: demo.listenUpload
         }, function(err, data) {
           if (err) {
             wrapper.querySelector('.result').innerHTML = '失败了'
@@ -92,7 +114,19 @@
             console.log(data)
           }
         })
-
+      }
+      window[callbackName] = function() {
+        if (demo.upload) {
+          var input = document.createElement('input')
+          input.setAttribute('type', 'file')
+          input.onchange = function() {
+            demo.files = input.files[0]
+            startRequest()
+          }
+          input.click()
+        } else {
+          startRequest()
+        }
       }
       tmplText = tmplText.replace(/{{desc}}/g, demo.desc)
       tmplText = tmplText.replace(/{{callback}}/g, callbackName)
@@ -109,6 +143,7 @@
       options.method = options.method || 'GET'
       options.headers = options.headers || {}
       var xhr = new XMLHttpRequest()
+      var data = null
       xhr.open(options.method, url)
       for (var i in options.headers) {
         xhr.setRequestHeader(i, options.headers[i])
@@ -122,7 +157,16 @@
       if (options.withCredentials) {
         xhr.withCredentials = true
       }
-      xhr.send()
+      if (options.files) {
+        data = new FormData()
+        data.append('file', options.files, options.files.name)
+      }
+      if (options.listenUpload) {
+        xhr.upload.addEventListener('progress', function(e) {
+          console.log('uploading')
+        })
+      }
+      xhr.send(data)
     }
 
   </script>

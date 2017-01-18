@@ -15,6 +15,10 @@ module.exports = function() {
       res.set('Access-Control-Allow-Origin', '*')
       res.send('ok')
     })
+    .post(function(req, res, next) {
+      res.set('Access-Control-Allow-Origin', '*')
+      res.send('ok')
+    })
   app.route('/api3')
     .options(function(req, res, next) {
       res.set('Access-Control-Allow-Origin', '*')
@@ -22,6 +26,10 @@ module.exports = function() {
       res.send('ok')
     })
     .get(function(req, res, next) {
+      res.set('Access-Control-Allow-Origin', '*')
+      res.send('ok')
+    })
+    .post(function(req, res, next) {
       res.set('Access-Control-Allow-Origin', '*')
       res.send('ok')
     })
