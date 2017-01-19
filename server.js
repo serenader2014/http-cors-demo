@@ -28,6 +28,10 @@ module.exports = function() {
       res.send('ok')
     })
   app.route('/api2')
+    .options(function(req, res, next) {
+      setAllowOrigin(res)
+      res.send('ok')
+    })
     .get(function(req, res, next) {
       setAllowOrigin(res)
       res.send('ok')
