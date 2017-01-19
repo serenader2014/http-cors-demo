@@ -1,5 +1,6 @@
 var express = require('express')
 var app = express()
+var config = require('./config')
 
 function setAllowOrigin(res, domain){
   res.set('Access-Control-Allow-Origin', domain || '*')
@@ -71,17 +72,17 @@ module.exports = function() {
     })
   app.route('/api6')
     .get(function(req, res, next) {
-      setAllowOrigin(res, req.protocol + '://' + req.hostname + ':3334')
+      setAllowOrigin(res, req.protocol + '://' + req.hostname + ':' + config.clientPort)
       res.send('ok')
     })
   app.route('/api7')
     .get(function(req, res, next) {
-      setAllowOrigin(res, req.protocol + '://' + req.hostname + ':3334')
+      setAllowOrigin(res, req.protocol + '://' + req.hostname + ':' + config.clientPort)
       setAllowCredentials(res)      
       res.send('ok')
     })
-  app.listen(3333, function(err) {
+  app.listen(config.serverPort, function(err) {
     if (err) throw err
-    console.log('server running on 3333')
+    console.log('server running on ' + config.serverPort)
   })
 }

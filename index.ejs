@@ -22,7 +22,7 @@
     var tmpl = document.querySelector('#tmpl')
     var ul = document.querySelector('ul')
     document.cookie = 'testcookie=somevalue'
-    var apiBase = 'http://localhost:3333'
+    var apiBase = location.protocol + '//' + location.hostname + ':<%= serverPort %>'
     var demosConfig = [
       {
         desc: '请求没有配置跨域头的接口：',
