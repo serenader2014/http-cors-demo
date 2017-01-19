@@ -1,67 +1,83 @@
 var express = require('express')
 var app = express()
 
+function setAllowOrigin(res, domain){
+  res.set('Access-Control-Allow-Origin', domain || '*')
+}
+
+function setAllowHeaders(res, headers){
+  res.set('Access-Control-Allow-Headers', headers || 'X-Custom-Header')
+}
+
+function setAllowMethods(res, methods){
+  res.set('Access-Control-Allow-Methods', methods || 'GET,POST,PUT,DELETE')
+}
+
+function setAllowCredentials(res){
+  res.set('Access-Control-Allow-Credentials', 'true')
+}
+
 module.exports = function() {
   app.get('/no-cors', function(req, res, next) {
     res.send('ok');
   })
   app.route('/api1')
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', 'http://baidu.com')
+      setAllowOrigin(res, 'http://baidu.com')
       res.send('ok')
     })
   app.route('/api2')
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
       res.send('ok')
     })
     .post(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
       res.send('ok')
     })
   app.route('/api3')
     .options(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
-      res.set('Access-Control-Allow-Headers', 'X-Custom-Header')
+      setAllowOrigin(res)
+      setAllowHeaders(res)
       res.send('ok')
     })
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
       res.send('ok')
     })
     .post(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
       res.send('ok')
     })
   app.route('/api4')
     .options(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
-      res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+      setAllowOrigin(res)
+      setAllowMethods(res)
       res.send('ok')
     })
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
       res.send('ok')
     })
     .put(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
       res.send('ok')
     })
   app.route('/api5')
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Credentials', 'true')
-      res.set('Access-Control-Allow-Origin', '*')
+      setAllowOrigin(res)
+      setAllowCredentials(res)
       res.send('ok')
     })
   app.route('/api6')
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', 'http://localhost:3334')
+      setAllowOrigin(res, req.protocol + '://' + req.hostname + ':3334')
       res.send('ok')
     })
   app.route('/api7')
     .get(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', 'http://localhost:3334')
-      res.set('Access-Control-Allow-Credentials', 'true')
+      setAllowOrigin(res, req.protocol + '://' + req.hostname + ':3334')
+      setAllowCredentials(res)      
       res.send('ok')
     })
   app.listen(3333, function(err) {
